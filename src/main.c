@@ -50,10 +50,10 @@ static long io_systemd_network_Info(VarlinkServer *server,
 
         r = varlink_object_get_int(parameters, "ifindex", &ifindex);
         if (r < 0)
-                return varlink_call_reply_invalid_parameters(call, "ifindex", NULL);
+                return varlink_call_reply_invalid_parameter(call, "ifindex");
 
         if (ifindex < 1)
-                return varlink_call_reply_invalid_parameters(call, "ifindex", NULL);
+                return varlink_call_reply_invalid_parameter(call, "ifindex");
 
         r = rtnl_link_get_kernel(nl_sock, ifindex, NULL, &rtnl_link);
         if (r < 0)
