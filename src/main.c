@@ -36,7 +36,7 @@ static inline void rtnl_link_putp(void *p) {
                 rtnl_link_put(*(struct rtnl_link **)p);
 }
 
-static long io_systemd_network_Info(VarlinkServer *server,
+static long io_systemd_network_Info(VarlinkService *service,
                                     VarlinkCall *call,
                                     VarlinkObject *parameters,
                                     uint64_t flags,
@@ -70,7 +70,7 @@ static long io_systemd_network_Info(VarlinkServer *server,
         return varlink_call_reply(call, reply, 0);
 }
 
-static long io_systemd_network_List(VarlinkServer *server,
+static long io_systemd_network_List(VarlinkService *service,
                                     VarlinkCall *call,
                                     VarlinkObject *parameters,
                                     uint64_t flags,
@@ -116,7 +116,7 @@ static long io_systemd_network_List(VarlinkServer *server,
 
 int main(int argc, char **argv) {
         _cleanup_(nl_socket_freep) struct nl_sock *nl_sock = NULL;
-        _cleanup_(varlink_server_freep) VarlinkServer *server = NULL;
+        _cleanup_(varlink_service_freep) VarlinkService *service = NULL;
         const char *address;
         int fd = -1;
         _cleanup_(closep) int fd_epoll = -1;
@@ -137,11 +137,7 @@ int main(int argc, char **argv) {
         if (read(3, NULL, 0) == 0)
                 fd = 3;
 
-        r = varlink_server_new(&server,
-                               address,
-                               fd,
-                               NULL,
-                               &io_systemd_network_varlink, 1);
+        r = varlink_service_new(&service, "io.systemd.network", VERSION, address, fd);
         if (r < 0)
                 return EXIT_FAILURE;
 
@@ -153,13 +149,10 @@ int main(int argc, char **argv) {
         if (r < 0)
                 return EXIT_FAILURE;
 
-        r = varlink_server_set_method_callback(server, "io.systemd.network.List",
-                                               io_systemd_network_List, nl_sock);
-        if (r < 0)
-                return EXIT_FAILURE;
-
-        r = varlink_server_set_method_callback(server, "io.systemd.network.Info",
-                                               io_systemd_network_Info, nl_sock);
+        r = varlink_service_add_interface(service, io_systemd_network_varlink,
+                                          "List", io_systemd_network_List, nl_sock,
+                                          "Info", io_systemd_network_Info, nl_sock,
+                                          NULL);
         if (r < 0)
                 return EXIT_FAILURE;
 
@@ -168,8 +161,8 @@ int main(int argc, char **argv) {
                 return EXIT_FAILURE;
 
         ep.events = EPOLLIN;
-        ep.data.fd = varlink_server_get_fd(server);
-        if (epoll_ctl(fd_epoll, EPOLL_CTL_ADD, varlink_server_get_fd(server), &ep) < 0)
+        ep.data.fd = varlink_service_get_fd(service);
+        if (epoll_ctl(fd_epoll, EPOLL_CTL_ADD, varlink_service_get_fd(service), &ep) < 0)
                 return EXIT_FAILURE;
 
         sigemptyset(&mask);
@@ -201,8 +194,8 @@ int main(int argc, char **argv) {
                 if (n == 0)
                         continue;
 
-                if (event.data.fd == varlink_server_get_fd(server)) {
-                        r = varlink_server_process_events(server);
+                if (event.data.fd == varlink_service_get_fd(service)) {
+                        r = varlink_service_process_events(service);
                         if (r < 0) {
                                 fprintf(stderr, "Control: %s\n", strerror(-r));
                                 if (r != -EPIPE)
