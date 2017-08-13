@@ -137,7 +137,13 @@ int main(int argc, char **argv) {
         if (read(3, NULL, 0) == 0)
                 fd = 3;
 
-        r = varlink_service_new(&service, "io.systemd.network", VERSION, address, fd);
+        r = varlink_service_new(&service,
+                                "systemd",
+                                "Network Management",
+                                VERSION,
+                                "https://github.com/varlink/io.systemd.network",
+                                address,
+                                fd);
         if (r < 0)
                 return EXIT_FAILURE;
 
