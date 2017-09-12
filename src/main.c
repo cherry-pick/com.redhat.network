@@ -1,4 +1,4 @@
-#include "io.systemd.network.varlink.h"
+#include "io.systemd.network.varlink.c.inc"
 
 #include <errno.h>
 #include <libnl3/netlink/route/link.h>
