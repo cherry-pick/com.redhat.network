@@ -147,6 +147,10 @@ int main(int argc, char **argv) {
         if (r < 0)
                 return EXIT_FAILURE;
 
+        r = varlink_service_set_credentials_mode(service, 0666);
+        if (r < 0)
+                return EXIT_FAILURE;
+
         nl_sock = nl_socket_alloc();
         if (!nl_sock)
                 return EXIT_FAILURE;
