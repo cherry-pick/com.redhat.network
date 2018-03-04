@@ -1,17 +1,17 @@
-io_systemd_network_sources = files('''
+com_redhat_network_sources = files('''
         main.c
 '''.split())
 
-io_systemd_network_varlink_c_inc = custom_target(
-        'io.systemd.network.varlink',
-        input : 'io.systemd.network.varlink',
-        output : 'io.systemd.network.varlink.c.inc',
+com_redhat_network_varlink_c_inc = custom_target(
+        'com_redhat.network.varlink',
+        input : 'com.redhat.network.varlink',
+        output : 'com.redhat.network.varlink.c.inc',
         command : [varlink_wrapper_py, '@INPUT@', '@OUTPUT@'])
 
 exe = executable(
-        'io.systemd.network',
-        io_systemd_network_sources,
-        io_systemd_network_varlink_c_inc,
+        'com.redhat.network',
+        com_redhat_network_sources,
+        com_redhat_network_varlink_c_inc,
         dependencies : [
                 libvarlink,
                 libnl,

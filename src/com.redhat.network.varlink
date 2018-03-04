@@ -1,5 +1,5 @@
 # Provides information about network state
-interface io.systemd.network
+interface com.redhat.network
 
 type NetdevInfo (
   ifindex: int,

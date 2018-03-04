@@ -1,4 +1,4 @@
-# io.systemd.network
+# com.redhat.network
 
-Implements the [**io.systemd.network**](https://github.com/varlink/io.systemd.network/blob/master/src/io.systemd.network.varlink) interface using [varlink](http://varlink.org).
+Implements the [**com.redhat.network**](https://github.com/varlink/com.redhat.network/blob/master/src/com.redhat.network.varlink) interface using [varlink](http://varlink.org).
 

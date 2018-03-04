@@ -1,4 +1,4 @@
-#include "io.systemd.network.varlink.c.inc"
+#include "com.redhat.network.varlink.c.inc"
 
 #include <errno.h>
 #include <libnl3/netlink/route/link.h>
@@ -36,7 +36,7 @@ static inline void rtnl_link_putp(void *p) {
                 rtnl_link_put(*(struct rtnl_link **)p);
 }
 
-static long io_systemd_network_Info(VarlinkService *service,
+static long com_redhat_network_Info(VarlinkService *service,
                                     VarlinkCall *call,
                                     VarlinkObject *parameters,
                                     uint64_t flags,
@@ -57,7 +57,7 @@ static long io_systemd_network_Info(VarlinkService *service,
 
         r = rtnl_link_get_kernel(nl_sock, ifindex, NULL, &rtnl_link);
         if (r < 0)
-                return varlink_call_reply_error(call, "io.systemd.network.UnknownNetworkDevice", NULL);
+                return varlink_call_reply_error(call, "con.redhat.network.UnknownNetworkDevice", NULL);
 
         if (varlink_object_new(&info) < 0 ||
             varlink_object_set_int(info, "ifindex", ifindex) < 0 ||
@@ -70,7 +70,7 @@ static long io_systemd_network_Info(VarlinkService *service,
         return varlink_call_reply(call, reply, 0);
 }
 
-static long io_systemd_network_List(VarlinkService *service,
+static long com_redhat_network_List(VarlinkService *service,
                                     VarlinkCall *call,
                                     VarlinkObject *parameters,
                                     uint64_t flags,
@@ -138,10 +138,10 @@ int main(int argc, char **argv) {
                 fd = 3;
 
         r = varlink_service_new(&service,
-                                "systemd",
+                                "Red Hat",
                                 "Network Management",
                                 VERSION,
-                                "https://github.com/varlink/io.systemd.network",
+                                "https://github.com/varlink/com.redhat.network",
                                 address,
                                 fd);
         if (r < 0)
@@ -155,9 +155,9 @@ int main(int argc, char **argv) {
         if (r < 0)
                 return EXIT_FAILURE;
 
-        r = varlink_service_add_interface(service, io_systemd_network_varlink,
-                                          "List", io_systemd_network_List, nl_sock,
-                                          "Info", io_systemd_network_Info, nl_sock,
+        r = varlink_service_add_interface(service, com_redhat_network_varlink,
+                                          "List", com_redhat_network_List, nl_sock,
+                                          "Info", com_redhat_network_Info, nl_sock,
                                           NULL);
         if (r < 0)
                 return EXIT_FAILURE;

@@ -1,4 +1,4 @@
-Name:           io.systemd.network
+Name:           com.redhat.network
 Version:        1
 Release:        1%{?dist}
 Summary:        Systemd Network Interface
@@ -30,8 +30,8 @@ export LC_CTYPE=C.utf8
 
 %files
 %license LICENSE
-%{_bindir}/io.systemd.network
+%{_bindir}/com.redhat.network
 
 %changelog
 * Tue Aug 29 2017 <info@varlink.org> 1-1
-- io.systemd.network 1
+- com.redhat.network 1

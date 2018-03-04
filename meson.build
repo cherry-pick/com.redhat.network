@@ -1,4 +1,4 @@
-project('io.systemd.network', 'c',
+project('com.redhat.network', 'c',
         version : '1',
         license : 'ASL2.0',
         default_options: [
