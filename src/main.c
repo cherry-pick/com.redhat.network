@@ -1,6 +1,7 @@
 #include "com.redhat.network.varlink.c.inc"
 
 #include <errno.h>
+#include <getopt.h>
 #include <libnl3/netlink/route/link.h>
 #include <string.h>
 #include <signal.h>
@@ -117,8 +118,14 @@ static long com_redhat_network_List(VarlinkService *service,
 int main(int argc, char **argv) {
         _cleanup_(nl_socket_freep) struct nl_sock *nl_sock = NULL;
         _cleanup_(varlink_service_freep) VarlinkService *service = NULL;
-        const char *address;
         int fd = -1;
+        static const struct option options[] = {
+                { "varlink", required_argument, NULL, 'v' },
+                { "help",    no_argument,       NULL, 'h' },
+                {}
+        };
+        int c;
+        const char *address = NULL;
         _cleanup_(closep) int fd_epoll = -1;
         _cleanup_(closep) int fd_signal = -1;
         sigset_t mask;
@@ -126,12 +133,19 @@ int main(int argc, char **argv) {
         bool exit = false;
         int r;
 
-        address = argv[1];
-        if (!address) {
-                fprintf(stderr, "Error: missing address.\n");
+        while ((c = getopt_long(argc, argv, ":vh", options, NULL)) >= 0) {
+                switch (c) {
+                        case 'h':
+                                printf("Usage: %s --varlink=URI\n\n", program_invocation_short_name);
+                                return EXIT_SUCCESS;
 
-                return EXIT_FAILURE;
+                        case 'v':
+                                address = optarg;
+                }
         }
+
+        if (!address)
+                return EXIT_FAILURE;
 
         /* An activator passed us our listen socket. */
         if (read(3, NULL, 0) == 0)
